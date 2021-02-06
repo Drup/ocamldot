@@ -28,8 +28,7 @@ let usage () =
   exit 1
 
 let main () =
-  if Array.length Sys.argv < 2 then
-    usage ();
+  if Array.length Sys.argv < 2 then usage ();
 
   let p = Dot.parse_file Sys.argv.(1) in
   Dot.print stdout p

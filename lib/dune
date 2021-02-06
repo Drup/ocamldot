@@ -1,9 +1,9 @@
 (ocamllex odot_lexer)
+
 (ocamlyacc odot_parser)
 
 (library
  (name dot)
  (public_name dot)
  (libraries unix)
- (modules_without_implementation odot_types)
-)
+ (modules_without_implementation odot_types))

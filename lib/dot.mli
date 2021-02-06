@@ -28,10 +28,8 @@
 (** {2 Representation of dot graphs} *)
 
 type graph_kind = Graph | Digraph
-type id =
-    Simple_id of string
-  | Html_id of string
-  | Double_quoted_id of string
+
+type id = Simple_id of string | Html_id of string | Double_quoted_id of string
 
 type attr = id * id option
 
@@ -41,14 +39,12 @@ type port = id * compass_pt option
 
 type node_id = id * port option
 
-type edge_stmt_point =
-    Edge_node_id of node_id
-  | Edge_subgraph of subgraph
+type edge_stmt_point = Edge_node_id of node_id | Edge_subgraph of subgraph
 
 and edge_stmt = edge_stmt_point * edge_stmt_point list * attr list
 
 and attr_stmt =
-    Attr_graph of attr list
+  | Attr_graph of attr list
   | Attr_node of attr list
   | Attr_edge of attr list
 
@@ -59,24 +55,20 @@ and stmt =
   | Stmt_attr of attr_stmt
   | Stmt_subgraph of subgraph
 
-and subgraph =
-    { sub_id : id option ;
-      sub_stmt_list : stmt list ;
-    }
+and subgraph = { sub_id : id option; sub_stmt_list : stmt list }
 
-and graph =
-    { strict : bool ;
-      kind : graph_kind ;
-      id : id option;
-      stmt_list : stmt list ;
-    }
-
+and graph = {
+  strict : bool;
+  kind : graph_kind;
+  id : id option;
+  stmt_list : stmt list;
+}
 
 (** {2 Parsing} *)
 
+exception Parse_error of int * int
 (** Raised on parse error, indicating the position
    as [line, character on line]. *)
-exception Parse_error of int * int
 
 val parse_file : string -> graph
 
@@ -85,29 +77,44 @@ val parse_string : string -> graph
 (** {2 Printing} *)
 
 val string_of_graph_kind : graph_kind -> string
+
 val string_of_id : id -> string
+
 val string_of_attr : id * id option -> string
+
 val string_of_attr_list : (id * id option) list -> string
+
 val string_of_compass_pt : compass_pt -> string
+
 val string_of_node_id : id * (id * compass_pt option) option -> string
+
 val string_of_edge_stmt_point : graph_kind -> edge_stmt_point -> string
+
 val string_of_edge_stmt : graph_kind -> edge_stmt -> string
+
 val string_of_attr_stmt : attr_stmt -> string
+
 val string_of_stmt : graph_kind -> stmt -> string
+
 val string_of_stmt_list : graph_kind -> stmt list -> string
+
 val string_of_subgraph : graph_kind -> subgraph -> string
 
 val string_of_graph : graph -> string
+
 val print : out_channel -> graph -> unit
 
-(** @raise Sys_error if the file cannot be open for writing. *)
 val print_file : string -> graph -> unit
+(** @raise Sys_error if the file cannot be open for writing. *)
 
 (** {2 Useful functions} *)
 
 val attr_value : id -> attr list -> id option
 
-val node_id : ?port: id -> ?comp: compass_pt -> id -> node_id
+val node_id : ?port:id -> ?comp:compass_pt -> id -> node_id
+
 val simple_node_id : string -> node_id
+
 val dblq_node_id : string -> node_id
+
 val html_node_id : string -> node_id

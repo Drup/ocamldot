@@ -28,29 +28,40 @@
 (** To choose between the dot program to use to create images. *)
 type dot_program = Dot | Fdp | Neato | Twopi | Circo
 
-
 (** @param dot_program is [Dot] by default
    @param tmp_hash is the prefix to use for the temporary files.
 *)
 class virtual box :
-    ?dot_program:dot_program ->
-      tmp_hash: string -> unit ->
-	object
-	  val mutable current_zoom : float
-	  val mutable dot_height : int
-	  val mutable dot_width : int
-	  val mutable ids : (float * float * float * float * string) list
-	  method box : GPack.box
-	  method virtual build_graph : Dot.graph
-	  method clean_files : unit
-	  method virtual on_button1_press : x: int -> y: int -> string option -> unit
-	  method on_button3_press : int -> int -> unit
-	  method refresh : unit -> unit
-	  method virtual refresh_data : unit
-	  method update_info : unit
-	  method zoom : unit -> unit
-	end
+  ?dot_program:dot_program
+  -> tmp_hash:string
+  -> unit
+  -> object
+       val mutable current_zoom : float
 
+       val mutable dot_height : int
+
+       val mutable dot_width : int
+
+       val mutable ids : (float * float * float * float * string) list
+
+       method box : GPack.box
+
+       method virtual build_graph : Dot.graph
+
+       method clean_files : unit
+
+       method virtual on_button1_press : x:int -> y:int -> string option -> unit
+
+       method on_button3_press : int -> int -> unit
+
+       method refresh : unit -> unit
+
+       method virtual refresh_data : unit
+
+       method update_info : unit
+
+       method zoom : unit -> unit
+     end
 
 (*
 type text = {
