@@ -31,7 +31,7 @@ let main () =
   if Array.length Sys.argv < 2 then
     usage ();
 
-  let p = Odot.parse_file Sys.argv.(1) in
-  Odot.print stdout p
+  let p = Dot.parse_file Sys.argv.(1) in
+  Dot.print stdout p
 
 let _ = main ()

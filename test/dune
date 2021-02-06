@@ -1,0 +1,54 @@
+(executable
+ (name test)
+ (libraries dot)
+ (modules test)
+)
+
+(rule (with-stdout-to test1.dot.rew (run ./test.exe %{dep:test1.dot})))
+(rule (with-stdout-to test1.dot.out (run dot -Tps %{dep:test1.dot.rew})))
+(rule (with-stdout-to test1.dot.expected (run dot -Tps %{dep:test1.dot})))
+(rule
+ (alias runtest)
+ (action (diff test1.dot.expected test1.dot.out)))
+
+(rule (with-stdout-to test2.dot.rew (run ./test.exe %{dep:test2.dot})))
+(rule (with-stdout-to test2.dot.out (run dot -Tps %{dep:test2.dot.rew})))
+(rule (with-stdout-to test2.dot.expected (run dot -Tps %{dep:test2.dot})))
+(rule
+ (alias runtest)
+ (action (diff test2.dot.expected test2.dot.out)))
+
+(rule (with-stdout-to test3.dot.rew (run ./test.exe %{dep:test3.dot})))
+(rule (with-stdout-to test3.dot.out (run dot -Tps %{dep:test3.dot.rew})))
+(rule (with-stdout-to test3.dot.expected (run dot -Tps %{dep:test3.dot})))
+(rule
+ (alias runtest)
+ (action (diff test3.dot.expected test3.dot.out)))
+
+(rule (with-stdout-to test4.dot.rew (run ./test.exe %{dep:test4.dot})))
+(rule (with-stdout-to test4.dot.out (run dot -Tps %{dep:test4.dot.rew})))
+(rule (with-stdout-to test4.dot.expected (run dot -Tps %{dep:test4.dot})))
+(rule
+ (alias runtest)
+ (action (diff test4.dot.expected test4.dot.out)))
+
+(rule (with-stdout-to test5.dot.rew (run ./test.exe %{dep:test5.dot})))
+(rule (with-stdout-to test5.dot.out (run dot -Tps %{dep:test5.dot.rew})))
+(rule (with-stdout-to test5.dot.expected (run dot -Tps %{dep:test5.dot})))
+(rule
+ (alias runtest)
+ (action (diff test5.dot.expected test5.dot.out)))
+
+(rule (with-stdout-to test6.dot.rew (run ./test.exe %{dep:test6.dot})))
+(rule (with-stdout-to test6.dot.out (run dot -Tps %{dep:test6.dot.rew})))
+(rule (with-stdout-to test6.dot.expected (run dot -Tps %{dep:test6.dot})))
+(rule
+ (alias runtest)
+ (action (diff test6.dot.expected test6.dot.out)))
+
+; (executable
+;  (name test_gtk)
+;  (libraries dot_gtk)
+;  (modules test_gtk)
+; )
+
