@@ -18,5 +18,7 @@ config.log
 config.lineno
 config.status
 ocaml_config.sh
+_build
+*.install
 
 

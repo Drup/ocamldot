@@ -41,7 +41,7 @@ class virtual box :
 	  val mutable dot_width : int
 	  val mutable ids : (float * float * float * float * string) list
 	  method box : GPack.box
-	  method virtual build_graph : Odot.graph
+	  method virtual build_graph : Dot.graph
 	  method clean_files : unit
 	  method virtual on_button1_press : x: int -> y: int -> string option -> unit
 	  method on_button3_press : int -> int -> unit
@@ -70,10 +70,10 @@ class virtual box :
   object
     val mutable current_zoom : float
     val mutable edges : 'a list
-    val mutable graph : Odot.graph option
+    val mutable graph : Dot.graph option
     val mutable nodes : node list
     method box : GPack.box
-    method virtual build_graph : Odot.graph
+    method virtual build_graph : Dot.graph
     method clean_files : unit
     method display : unit -> unit
     method input_zoom : unit -> unit

@@ -73,11 +73,11 @@ let show image file zoom_file zoom =
 let get_graph_bounding_box stmt_list =
   let rec iter = function
     [] -> raise Not_found
-  | (Odot.Stmt_attr (Odot.Attr_graph attr_list)) :: q ->
+  | (Dot.Stmt_attr (Dot.Attr_graph attr_list)) :: q ->
       begin
-        match Odot.attr_value (Odot.Simple_id "bb") attr_list with
-          Some (Odot.Simple_id v)
-        | Some (Odot.Double_quoted_id v) ->
+        match Dot.attr_value (Dot.Simple_id "bb") attr_list with
+          Some (Dot.Simple_id v)
+        | Some (Dot.Double_quoted_id v) ->
             begin
               match split_string v [','] with
                 [x1;y1;x2;y2] ->
@@ -101,37 +101,37 @@ let get_graph_bounding_box stmt_list =
 
 let analyse_annot_dot_file f =
   try
-    let graph = Odot.parse_file f in
-    let (_,_,width,height) = get_graph_bounding_box graph.Odot.stmt_list in
+    let graph = Dot.parse_file f in
+    let (_,_,width,height) = get_graph_bounding_box graph.Dot.stmt_list in
     p_dbg (Printf.sprintf "width=%d,height=%d" width height);
     let rec iter acc = function
       [] -> acc
     |	stmt :: q ->
         match stmt with
-          Odot.Stmt_node (node_id,attr_list) ->
+          Dot.Stmt_node (node_id,attr_list) ->
             p_dbg "Stmt_node";
             begin
               try
                 let w =
-                  match Odot.attr_value (Odot.Simple_id "width") attr_list with
-                  | Some (Odot.Simple_id v)
-                  | Some (Odot.Double_quoted_id v) ->
+                  match Dot.attr_value (Dot.Simple_id "width") attr_list with
+                  | Some (Dot.Simple_id v)
+                  | Some (Dot.Double_quoted_id v) ->
                       (try float_of_string v
                        with _ -> raise Not_found)
                   | _ -> raise Not_found
                 in
                 let h =
-                  match Odot.attr_value (Odot.Simple_id "height") attr_list with
-                  | Some (Odot.Simple_id v)
-                  | Some (Odot.Double_quoted_id v) ->
+                  match Dot.attr_value (Dot.Simple_id "height") attr_list with
+                  | Some (Dot.Simple_id v)
+                  | Some (Dot.Double_quoted_id v) ->
                       (try float_of_string v
                        with _ -> raise Not_found)
                   | _ -> raise Not_found
                 in
                 let (x,y) =
-                  match Odot.attr_value (Odot.Simple_id "pos") attr_list with
-                  | Some (Odot.Simple_id v)
-                  | Some (Odot.Double_quoted_id v) ->
+                  match Dot.attr_value (Dot.Simple_id "pos") attr_list with
+                  | Some (Dot.Simple_id v)
+                  | Some (Dot.Double_quoted_id v) ->
                       begin
                         match split_string v [','] with
                           [x;y] ->
@@ -149,7 +149,7 @@ let analyse_annot_dot_file f =
                 let y1 = (float y) -. h /. 2.0 in
                 let x2 = (float x) +. w /. 2.0 in
                 let y2 = (float y) +. h /. 2.0 in
-                let s_id = Odot.string_of_node_id node_id in
+                let s_id = Dot.string_of_node_id node_id in
                 p_dbg (Printf.sprintf "id %s: x1=%f y1=%f x2=%f y2=%f"
                  s_id x1 y1 x2 y2);
                 iter ((x1,y1,x2,y2,s_id)::acc) q
@@ -157,13 +157,13 @@ let analyse_annot_dot_file f =
                 Not_found ->
                   iter acc q
             end
-        | Odot.Stmt_subgraph g ->
-            iter acc (g.Odot.sub_stmt_list @ q)
-        | Odot.Stmt_equals _
-        | Odot.Stmt_edge _
-        | Odot.Stmt_attr _ -> iter acc q
+        | Dot.Stmt_subgraph g ->
+            iter acc (g.Dot.sub_stmt_list @ q)
+        | Dot.Stmt_equals _
+        | Dot.Stmt_edge _
+        | Dot.Stmt_attr _ -> iter acc q
     in
-    (width, height, iter [] graph.Odot.stmt_list)
+    (width, height, iter [] graph.Dot.stmt_list)
   with
     e ->
       p_dbg (Printexc.to_string e);
@@ -207,7 +207,7 @@ class virtual box ?(dot_program=Dot) ~tmp_hash () =
     val mutable dot_height = 1
     val mutable ids = []
 
-    method virtual build_graph : Odot.graph
+    method virtual build_graph : Dot.graph
     method virtual refresh_data : unit
     method virtual on_button1_press : x: int -> y: int -> string option -> unit
 
@@ -249,7 +249,7 @@ class virtual box ?(dot_program=Dot) ~tmp_hash () =
       self#clean_files;
       self#refresh_data ;
       let g = self#build_graph in
-      Odot.print_file dot_file g;
+      Dot.print_file dot_file g;
       let com = Printf.sprintf
         "%s -s%d -y %s > %s && %s -s%d -T png -o %s %s "
           (string_of_dot_program dot_program)
@@ -381,18 +381,18 @@ type node = {
 }
 
 let string_of_id = function
-  Odot.Simple_id s -> s
-| Odot.Double_quoted_id s -> s
-| Odot.Html_id s -> s
+  Dot.Simple_id s -> s
+| Dot.Double_quoted_id s -> s
+| Dot.Html_id s -> s
 ;;
 
 let attr_value name attr =
   try
-    match Odot.attr_value (Odot.Simple_id name) attr with
+    match Dot.attr_value (Dot.Simple_id name) attr with
       None -> raise Not_found
     | Some s -> string_of_id s
   with Not_found ->
-      match Odot.attr_value (Odot.Double_quoted_id name) attr with
+      match Dot.attr_value (Dot.Double_quoted_id name) attr with
         None -> raise Not_found
       | Some s -> string_of_id s
 ;;
@@ -433,7 +433,7 @@ let get_label_position attrs =
 ;;
 
 let node_of_odot_node f_click1 f_click3 group props id attrs =
-  let id = Odot.string_of_id id in
+  let id = Dot.string_of_id id in
   let w = float_of_string (attr_value "width" attrs) in
   let h = float_of_string (attr_value "height" attrs) in
   let (x,y) =
@@ -543,7 +543,7 @@ let props_of_graph_node_attr pr attrs =
 
 let get_graph_attrs stmt_list =
   let f acc = function
-    Odot.Stmt_attr (Odot.Attr_graph l) -> l @ acc
+    Dot.Stmt_attr (Dot.Attr_graph l) -> l @ acc
   | _ -> acc
   in
   List.fold_left f [] stmt_list
@@ -552,9 +552,9 @@ let get_graph_attrs stmt_list =
 let create_subgraph f_click1 f_click3 group props g =
   let node =
     try
-      let (x,y,w,h) = get_graph_bounding_box g.Odot.sub_stmt_list in
+      let (x,y,w,h) = get_graph_bounding_box g.Dot.sub_stmt_list in
       let attrs = List.map
-        (fun (s1,s2) -> (Odot.Simple_id s1, Some (Odot.Double_quoted_id s2)))
+        (fun (s1,s2) -> (Dot.Simple_id s1, Some (Dot.Double_quoted_id s2)))
         [
           "height", string_of_int h;
           "width", string_of_int w;
@@ -562,10 +562,10 @@ let create_subgraph f_click1 f_click3 group props g =
         ]
       in
       let id =
-        match g.Odot.sub_id with None -> Odot.Simple_id "" | Some id -> id
+        match g.Dot.sub_id with None -> Dot.Simple_id "" | Some id -> id
       in
       node_of_odot_node f_click1 f_click3 group props id
-          (attrs @ (get_graph_attrs g.Odot.sub_stmt_list))
+          (attrs @ (get_graph_attrs g.Dot.sub_stmt_list))
     with _ ->
       let item = GCan.rect ~x1: 0.0 ~y1: 0. ~x2: 0. ~y2: 0. group in
         { node_item = (item :> GCan.base_item) ;
@@ -615,7 +615,7 @@ class virtual box  ?(dot_program=Dot) ~tmp_hash () =
     val mutable nodes = []
     val mutable graph = None
 
-    method virtual build_graph : Odot.graph
+    method virtual build_graph : Dot.graph
     method virtual refresh_data : unit
     method virtual on_button1_press : x: int -> y: int -> string option -> unit
 
@@ -639,7 +639,7 @@ class virtual box  ?(dot_program=Dot) ~tmp_hash () =
 
     method load_graph file =
       try
-        graph <- Some (Odot.parse_file file)
+        graph <- Some (Dot.parse_file file)
       with Failure s -> GToolbox.message_box "Error" s
 
     method resize_text_items =
@@ -671,7 +671,7 @@ class virtual box  ?(dot_program=Dot) ~tmp_hash () =
         None -> ()
       | Some g ->
           canvas#set_pixels_per_unit current_zoom;
-          let (x1,y1,x2,y2) = get_graph_bounding_box g.Odot.stmt_list in
+          let (x1,y1,x2,y2) = get_graph_bounding_box g.Dot.stmt_list in
           let (y1,y2) = (-y1, -y2) in
           canvas#set_scroll_region
             ~x1:(float x1 -. border) ~y1:(float y1 -. border)
@@ -679,38 +679,38 @@ class virtual box  ?(dot_program=Dot) ~tmp_hash () =
 
           let rec f_stmt group props = function
             [] -> ()
-          | Odot.Stmt_node ((id,_), attrs) :: q ->
+          | Dot.Stmt_node ((id,_), attrs) :: q ->
               let node = node_of_odot_node
                 self#on_button1_press self#on_button3_press
                   group props id attrs
               in
               nodes <- node :: nodes;
               f_stmt group props q
-          | Odot.Stmt_attr (Odot.Attr_node attrs) :: q ->
+          | Dot.Stmt_attr (Dot.Attr_node attrs) :: q ->
               let props = props_of_graph_node_attr props attrs in
               f_stmt group props q
-          | Odot.Stmt_subgraph g2 :: q ->
+          | Dot.Stmt_subgraph g2 :: q ->
               let (node, group2) = create_subgraph
                 self#on_button1_press self#on_button3_press
                   group props g2
               in
               nodes <- node :: nodes;
-              f_stmt group2 props g2.Odot.sub_stmt_list;
+              f_stmt group2 props g2.Dot.sub_stmt_list;
               f_stmt group props q
-          | Odot.Stmt_edge (src, l, attrs) :: q ->
+          | Dot.Stmt_edge (src, l, attrs) :: q ->
               let l_edges = edges_of_odot_edges group props (src :: l) attrs in
               edges <- l_edges @ edges;
               f_stmt group props q
           | _ :: q ->
               f_stmt group props q
           in
-          f_stmt canvas#root default_props g.Odot.stmt_list;
+          f_stmt canvas#root default_props g.Dot.stmt_list;
           canvas#misc#show ()
 
     method refresh_dot () =
       self#clean_files;
       let g = self#build_graph in
-      Odot.print_file dot_file g;
+      Dot.print_file dot_file g;
       let com = Printf.sprintf
         "%s -s%d -y %s > %s"
           (string_of_dot_program dot_program)

@@ -25,8 +25,6 @@
 
 open Odot_types
 
-let version = Odot_version.version
-
 type graph_kind = Odot_types.graph_kind =
     Graph | Digraph
 

@@ -1,0 +1,5 @@
+(library
+ (name dot_gtk)
+ (public_name dot_gtk)
+ (libraries dot lablgtk2.gnomecanvas)
+)
