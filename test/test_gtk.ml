@@ -39,31 +39,31 @@ let md5sum_of_string s =
 (*/c==v=[Misc.md5sum_of_string]=1.0====*)
 
 class box file =
-  object (self)
+  object
     inherit
-      Odot_view.box
-        ~dot_program:Odot_view.Fdp
+      Dot_gtk.box
+        ~dot_program:Dot_gtk.Fdp
         ~tmp_hash:(Printf.sprintf "/tmp/%s" (md5sum_of_string file))
         ()
 
     method refresh_data = ()
 
     method build_graph =
-      try Odot.parse_file file
+      try Dot.parse_file file
       with e ->
         let s = Printexc.to_string e in
-        GToolbox.message_box "Error" s;
+        GToolbox.message_box ~title:"Error" s;
         {
-          Odot.id = None;
-          Odot.strict = false;
-          Odot.kind = Odot.Graph;
-          Odot.stmt_list = [];
+          Dot.id = None;
+          Dot.strict = false;
+          Dot.kind = Dot.Graph;
+          Dot.stmt_list = [];
         }
 
-    method on_button1_press ~x ~y =
+    method on_button1_press ~x:_ ~y:_ =
       function
-      | None -> GToolbox.message_box "You clicked !" "no id under cursor"
-      | Some s -> GToolbox.message_box "You clicked !" s
+      | None -> GToolbox.message_box ~title:"You clicked !" "no id under cursor"
+      | Some s -> GToolbox.message_box ~title:"You clicked !" s
   end
 
 let usage () =
@@ -78,7 +78,7 @@ let main () =
   let w = GWindow.window ~width:600 ~height:400 ~title:f () in
   let b = new box f in
   w#add b#box#coerce;
-  ignore (w#connect#destroy GMain.Main.quit);
+  ignore (w#connect#destroy ~callback:GMain.Main.quit);
   w#show ();
   GMain.Main.main ()
 

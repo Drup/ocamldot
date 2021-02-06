@@ -123,8 +123,8 @@
  (action
   (diff test6.dot.expected test6.dot.out)))
 
-; (executable
-;  (name test_gtk)
-;  (libraries dot_gtk)
-;  (modules test_gtk)
-; )
+(executable
+ (name test_gtk)
+ (libraries dot_gtk)
+ (modules test_gtk)
+)
