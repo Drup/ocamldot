@@ -26,7 +26,7 @@
 open Odot_parser
 
 
-let print_DEBUG s = () (*prerr_endline*)
+let print_DEBUG _ = () (*prerr_endline*)
 
 let line = ref 0
 
@@ -84,7 +84,7 @@ rule main = parse
     {
       let id = Lexing.lexeme lexbuf in
       try
-	List.assoc (String.lowercase id) keywords
+	List.assoc (String.lowercase_ascii id) keywords
       with
 	Not_found ->
 	  print_DEBUG ("ID "^id);
