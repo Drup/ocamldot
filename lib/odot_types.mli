@@ -58,14 +58,13 @@ and stmt =
   | Stmt_subgraph of subgraph
 
 and subgraph =
-    { mutable sub_id : id option ;
-      mutable sub_stmt_list : stmt list ;
+    { sub_id : id option ;
+      sub_stmt_list : stmt list ;
     }
 
 and graph =
-    {
-      mutable strict : bool ;
-      mutable kind : graph_kind ;
-      mutable id : id option;
-      mutable stmt_list : stmt list ;
+    { strict : bool ;
+      kind : graph_kind ;
+      id : id option;
+      stmt_list : stmt list ;
     }
