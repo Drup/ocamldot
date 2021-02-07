@@ -153,9 +153,8 @@ class virtual box ?(dot_program = Dot) ~tmp_hash () =
   in
   let zooms = [ 10; 20; 30; 40; 50; 60; 70; 80; 90; 100; 120 ] in
   let wcombo =
-    GEdit.combo
-      ~popdown_strings:(List.map (fun s -> Printf.sprintf "%d%%" s) zooms)
-      ~allow_empty:false ~enable_arrow_keys:true ~value_in_list:true
+    GEdit.combo_box_text
+      ~strings:(List.map (fun s -> Printf.sprintf "%d%%" s) zooms)
       ~packing:(hbox#pack ~expand:false) ()
   in
   let wb_refresh =
@@ -193,8 +192,9 @@ class virtual box ?(dot_program = Dot) ~tmp_hash () =
 
     method zoom () =
       let z =
-        try Scanf.sscanf wcombo#entry#text "%d%%" (fun a -> Some a)
-        with _ -> None
+        match GEdit.text_combo_get_active wcombo with
+        | Some s -> Scanf.sscanf s "%d%%" (fun a -> Some a)
+        | None -> None
       in
       match z with
       | None -> ()
@@ -297,16 +297,15 @@ class virtual box ?(dot_program = Dot) ~tmp_hash () =
         List.map
           (fun z ->
             let t = Printf.sprintf "%d%%" z in
-            `I (t, fun () -> wcombo#entry#set_text t))
+            `I (t, fun () -> GEdit.text_combo_add wcombo t))
           zooms
       in
       GToolbox.popup_menu ~entries ~button:3 ~time:Int32.zero
 
     initializer
     ignore (vbox#connect#destroy ~callback:(fun () -> self#clean_files));
-    wcombo#entry#set_editable false;
-    wcombo#entry#set_text "100%";
-    ignore (wcombo#entry#connect#changed ~callback:self#zoom);
+    (fst wcombo)#set_active 9 (* 100% *);
+    ignore ((fst wcombo)#connect#changed ~callback:self#zoom);
     ignore (wb_refresh#connect#clicked ~callback:self#refresh);
     ignore
       (evt_box#event#connect#button_press ~callback:(fun evt ->
