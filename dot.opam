@@ -1,0 +1,17 @@
+opam-version: "2.0"
+version: "2.0"
+synopsis: "Dot is a small library to parse and print graphviz dot files"
+maintainer: "zoggy@bat8.org"
+authors: "Maxence Guesdon"
+homepage: "http://zoggy.github.io/ocamldot/"
+bug-reports: "https://github.com/zoggy/ocamldot/issues"
+dev-repo: "git+https://github.com/zoggy/ocamldot.git"
+depends: [
+  "ocaml" {>= "4.03.0"}
+  "dune" {>= "1.0"}
+]
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs]
+  ["dune" "runtest" "-p" name "-j" jobs] {with-test}
+]
